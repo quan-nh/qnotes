@@ -15,38 +15,47 @@ type Page struct {
 	NoteName     string
 }
 
+var page Page
 var homeTmpl = template.Must(template.New("home").ParseFiles("template/base.html", "template/home.html"))
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	notebooks, err := getNoteBooks()
+	// set default value
+	page.Title = "note/home"
+	page.NoteBookName = ""
+	page.Notes = nil
+	page.NoteName = ""
+
+	// get notebooks
+	err := getNoteBooks(util.Conf.Repo, &page)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = homeTmpl.ExecuteTemplate(w, "base", &Page{Title: "Home", Notebooks: notebooks})
+	// render template
+	err = homeTmpl.ExecuteTemplate(w, "base", &page)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-func getNoteBooks() ([]string, error) {
+// get notebooks in repo.
+func getNoteBooks(repo string, page *Page) error {
 
-	fileInfos, err := ioutil.ReadDir(util.Conf.Repo)
+	fileInfos, err := ioutil.ReadDir(repo)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	result := make([]string, 0, len(fileInfos))
-
+	page.Notebooks = page.Notebooks[:0]
 	for _, fileInfo := range fileInfos {
 
 		if fileInfo.IsDir() && fileInfo.Name() != ".git" {
-			result = append(result, fileInfo.Name())
+			page.Notebooks = append(page.Notebooks, fileInfo.Name())
 		}
 
 	}
 
-	return result, nil
+	return nil
 }
