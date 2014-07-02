@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"fmt"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 	"qnotes/util"
 )
@@ -18,14 +18,35 @@ type Page struct {
 var homeTmpl = template.Must(template.New("home").ParseFiles("template/base.html", "template/home.html"))
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	getNoteBooks()
-	err := homeTmpl.ExecuteTemplate(w, "base", &Page{Title: "Home"})
+	notebooks, err := getNoteBooks()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = homeTmpl.ExecuteTemplate(w, "base", &Page{Title: "Home", Notebooks: notebooks})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-func getNoteBooks() {
-	fmt.Println(util.Conf.Repo)
+func getNoteBooks() ([]string, error) {
+
+	fileInfos, err := ioutil.ReadDir(util.Conf.Repo)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]string, 0, len(fileInfos))
+
+	for _, fileInfo := range fileInfos {
+
+		if fileInfo.IsDir() && fileInfo.Name() != ".git" {
+			result = append(result, fileInfo.Name())
+		}
+
+	}
+
+	return result, nil
 }

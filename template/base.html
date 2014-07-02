@@ -37,8 +37,8 @@
       </li>
 
 {{/* iterate though existing notebooks */}}
-{{range $index, $notebook := .Notebooks}}
-        <li {{if eq .NoteBookName $notebook}}class="active"{{end}}>
+{{range $notebook := .Notebooks}}
+        <li {{if eq $.NoteBookName $notebook}}class="active"{{end}}>
           <a href="/{{$notebook}}">
             {{$notebook}}
           </a>
