@@ -13,6 +13,8 @@ type Page struct {
 	NoteBookName string
 	Notes        []string
 	NoteName     string
+	NoteContents []byte
+	Action       string
 }
 
 var page Page

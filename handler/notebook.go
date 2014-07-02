@@ -6,6 +6,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"qnotes/util"
+	"strings"
+)
+
+const (
+	ext = ".txt"
 )
 
 var notebookTmpl = template.Must(template.New("notebook").ParseFiles("template/base.html", "template/notebook.html"))
@@ -50,7 +55,7 @@ func getNotes(repo string, page *Page) error {
 	for _, fileInfo := range fileInfos {
 
 		if !fileInfo.IsDir() {
-			page.Notes = append(page.Notes, fileInfo.Name())
+			page.Notes = append(page.Notes, strings.TrimSuffix(fileInfo.Name(), ext))
 		}
 
 	}
