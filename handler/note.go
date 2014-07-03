@@ -19,7 +19,7 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
-	if len(page.Notebooks) == 0 {
+	if page.Notebooks == nil {
 		err = getNoteBooks(util.Conf.Repo, &page)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -27,7 +27,7 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if len(page.Notes) == 0 {
+	if page.Notes == nil {
 		err = getNotes(util.Conf.Repo, &page)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

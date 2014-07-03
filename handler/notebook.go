@@ -22,7 +22,7 @@ func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
-	if len(page.Notebooks) == 0 {
+	if page.Notebooks == nil {
 		err = getNoteBooks(util.Conf.Repo, &page)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
