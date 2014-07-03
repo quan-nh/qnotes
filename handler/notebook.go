@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"qnotes/util"
 	"strings"
 )
 
@@ -18,53 +17,53 @@ var notebookTmpl = template.Must(template.New("notebook").ParseFiles("template/b
 
 func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 
-	page.NoteBookName = mux.Vars(r)["notebook"]
-	page.Title = "note/" + page.NoteBookName
+	Page.NoteBookName = mux.Vars(r)["notebook"]
+	Page.Title = "note/" + Page.NoteBookName
 
-	if err := getNoteBooks(&page); err != nil {
+	if err := getNoteBooks(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// create new notebook if it doesn't exist
-	if !contains(page.Notebooks, page.NoteBookName) {
-		if err := page.createNotebook(); err != nil {
+	if !contains(Page.Notebooks, Page.NoteBookName) {
+		if err := Page.createNotebook(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	if err := getNotes(&page); err != nil {
+	if err := getNotes(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := notebookTmpl.ExecuteTemplate(w, "base", &page); err != nil {
+	if err := notebookTmpl.ExecuteTemplate(w, "base", &Page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-func getNotes(page *Page) error {
+func getNotes() error {
 
-	fileInfos, err := ioutil.ReadDir(util.Conf.Repo + "/" + page.NoteBookName)
+	fileInfos, err := ioutil.ReadDir(Page.Conf.Repo + "/" + Page.NoteBookName)
 	if err != nil {
 		return err
 	}
 
-	page.Notes = page.Notes[:0]
+	Page.Notes = Page.Notes[:0]
 
 	for _, fileInfo := range fileInfos {
 		if !fileInfo.IsDir() {
-			page.Notes = append(page.Notes, strings.TrimSuffix(fileInfo.Name(), ext))
+			Page.Notes = append(Page.Notes, strings.TrimSuffix(fileInfo.Name(), ext))
 		}
 	}
 
 	return nil
 }
 
-func (p *Page) createNotebook() error {
-	filename := util.Conf.Repo + "/" + p.NoteBookName
+func (p *page) createNotebook() error {
+	filename := Page.Conf.Repo + "/" + p.NoteBookName
 	return os.Mkdir(filename, os.ModeDir)
 }
 

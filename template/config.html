@@ -1,0 +1,16 @@
+{{define "content"}}
+<form method="POST" role="form">
+  <div class="form-group">
+    <label class="control-label" for="repo">Repository</label>
+    <input type="text" name="repo" value="{{.Conf.Repo}}" placeholder="/path/to/repo/" tabindex="1" class="form-control" />
+  </div>
+  <div class="form-group">
+    <label class="control-label" for="port">Port</label>
+    <input type="text" name="port" value=" {{.Conf.Port}}" placeholder="Port" tabindex="2" class="form-control" />
+  </div>
+  <input type="submit" class="btn btn-primary" value="Save" name="save">
+</form>
+{{end}}
+
+{{define "js"}}
+{{end}}

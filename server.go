@@ -4,7 +4,6 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"qnotes/handler"
-	"qnotes/util"
 )
 
 func main() {
@@ -12,13 +11,14 @@ func main() {
 	r.HandleFunc("/", handler.HomeHandler)
 	r.HandleFunc("/n/{notebook}", handler.NotebookHandler)
 	r.HandleFunc("/n/{notebook}/{note}", handler.NoteHandler)
+	r.HandleFunc("/config", handler.ConfigHandler)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public/")))
 	http.Handle("/", r)
 
-	err := util.LoadConfig()
+	err := handler.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	http.ListenAndServe(":"+util.Conf.Port, nil)
+	http.ListenAndServe(":"+handler.Page.Conf.Port, nil)
 }
