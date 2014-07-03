@@ -1,6 +1,18 @@
 {{define "content"}}
 
-  {{if eq .Action "edit"}}
+  {{if eq .Action "delete"}}
+
+    <H2>Are you sure you want to delete {{.NoteBookName}}/{{.NoteName}}?</H2>
+    <form method="POST">
+      <input type="submit" class='btn btn-danger' value="DELETE" name="delete">
+      <input type="submit" class='btn' value="Cancel" name="cancel">
+    </form>
+
+  {{else if eq .Action "edit"}}
+
+    <link rel="stylesheet" type="text/css" href="/js/markitup/skins/simple/style.css" />
+    <link rel="stylesheet" type="text/css" href="/js/markitup/sets/textile/style.css" />
+
     <br>
     <form method="POST">
     <input type="submit" class="btn btn-success" value="Save" name="save">
@@ -8,6 +20,7 @@
     <br>
     <br>
     <textarea cols="80" rows="25" name="note" id="textile">{{printf "%s" .NoteContents}}</textarea>
+    </form>
   {{else}}
     <br>
     <button class="btn btn-primary" onclick="window.location='{{ .NoteName }}?a=edit'">Edit</button>
@@ -21,9 +34,6 @@
 {{end}}
 
 {{define "js"}}
-  <link rel="stylesheet" type="text/css" href="/js/markitup/skins/simple/style.css" />
-  <link rel="stylesheet" type="text/css" href="/js/markitup/sets/textile/style.css" />
-
   <script type="text/javascript" src="/js/markitup/jquery.markitup.js"></script>
   <script type="text/javascript" src="/js/markitup/sets/textile/set.js"></script>
 

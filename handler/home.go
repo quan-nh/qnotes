@@ -28,7 +28,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	page.NoteName = ""
 
 	// get notebooks
-	err := getNoteBooks(util.Conf.Repo, &page)
+	err := getNoteBooks(&page)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -43,9 +43,9 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // get notebooks in repo.
-func getNoteBooks(repo string, page *Page) error {
+func getNoteBooks(page *Page) error {
 
-	fileInfos, err := ioutil.ReadDir(repo)
+	fileInfos, err := ioutil.ReadDir(util.Conf.Repo)
 	if err != nil {
 		return err
 	}

@@ -23,14 +23,14 @@ func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if page.Notebooks == nil {
-		err = getNoteBooks(util.Conf.Repo, &page)
+		err = getNoteBooks(&page)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	err = getNotes(util.Conf.Repo, &page)
+	err = getNotes(&page)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -43,9 +43,9 @@ func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getNotes(repo string, page *Page) error {
+func getNotes(page *Page) error {
 
-	fileInfos, err := ioutil.ReadDir(repo + "/" + page.NoteBookName)
+	fileInfos, err := ioutil.ReadDir(util.Conf.Repo + "/" + page.NoteBookName)
 	if err != nil {
 		return err
 	}

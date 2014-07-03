@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"qnotes/util"
 )
 
@@ -19,8 +20,31 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
+	if page.Action == "edit" && r.FormValue("save") == "Save" {
+		page.NoteContents = []byte(r.FormValue("note"))
+		err = page.save()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/n/"+page.NoteBookName+"/"+page.NoteName, http.StatusFound)
+	}
+
+	if page.Action == "delete" && r.FormValue("delete") == "DELETE" {
+		err = page.delete()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/n/"+page.NoteBookName, http.StatusFound)
+	}
+
+	if r.FormValue("cancel") == "Cancel" {
+		http.Redirect(w, r, "/n/"+page.NoteBookName+"/"+page.NoteName, http.StatusFound)
+	}
+
 	if page.Notebooks == nil {
-		err = getNoteBooks(util.Conf.Repo, &page)
+		err = getNoteBooks(&page)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -28,14 +52,14 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if page.Notes == nil {
-		err = getNotes(util.Conf.Repo, &page)
+		err = getNotes(&page)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	err = loadContent(util.Conf.Repo, &page)
+	err = loadContent(&page)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -48,8 +72,8 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loadContent(repo string, page *Page) error {
-	filename := repo + "/" + page.NoteBookName + "/" + page.NoteName + ext
+func loadContent(page *Page) error {
+	filename := util.Conf.Repo + "/" + page.NoteBookName + "/" + page.NoteName + ext
 
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -59,4 +83,14 @@ func loadContent(repo string, page *Page) error {
 	page.NoteContents = content
 
 	return nil
+}
+
+func (p *Page) save() error {
+	filename := util.Conf.Repo + "/" + p.NoteBookName + "/" + p.NoteName + ext
+	return ioutil.WriteFile(filename, p.NoteContents, 0600)
+}
+
+func (p *Page) delete() error {
+	filename := util.Conf.Repo + "/" + p.NoteBookName + "/" + p.NoteName + ext
+	return os.Remove(filename)
 }
