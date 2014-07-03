@@ -51,8 +51,15 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if page.Notes == nil {
-		err = getNotes(&page)
+	err = getNotes(&page)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// create new note if it doesn't exist
+	if !contains(page.Notes, page.NoteName) {
+		err = page.createNote()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -83,6 +90,12 @@ func loadContent(page *Page) error {
 	page.NoteContents = content
 
 	return nil
+}
+
+func (p *Page) createNote() error {
+	filename := util.Conf.Repo + "/" + p.NoteBookName + "/" + p.NoteName + ext
+	_, err := os.Create(filename)
+	return err
 }
 
 func (p *Page) save() error {
