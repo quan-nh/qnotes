@@ -28,15 +28,13 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	page.NoteName = ""
 
 	// get notebooks
-	err := getNoteBooks(&page)
-	if err != nil {
+	if err := getNoteBooks(&page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// render template
-	err = homeTmpl.ExecuteTemplate(w, "base", &page)
-	if err != nil {
+	if err := homeTmpl.ExecuteTemplate(w, "base", &page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

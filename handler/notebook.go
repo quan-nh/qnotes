@@ -21,29 +21,25 @@ func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 	page.NoteBookName = mux.Vars(r)["notebook"]
 	page.Title = "note/" + page.NoteBookName
 
-	err := getNoteBooks(&page)
-	if err != nil {
+	if err := getNoteBooks(&page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// create new notebook if it doesn't exist
 	if !contains(page.Notebooks, page.NoteBookName) {
-		err = page.createNotebook()
-		if err != nil {
+		if err := page.createNotebook(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	err = getNotes(&page)
-	if err != nil {
+	if err := getNotes(&page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = notebookTmpl.ExecuteTemplate(w, "base", &page)
-	if err != nil {
+	if err := notebookTmpl.ExecuteTemplate(w, "base", &page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -59,11 +55,9 @@ func getNotes(page *Page) error {
 	page.Notes = page.Notes[:0]
 
 	for _, fileInfo := range fileInfos {
-
 		if !fileInfo.IsDir() {
 			page.Notes = append(page.Notes, strings.TrimSuffix(fileInfo.Name(), ext))
 		}
-
 	}
 
 	return nil

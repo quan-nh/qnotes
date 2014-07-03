@@ -18,21 +18,19 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 	page.Title = "note/" + page.NoteName
 	page.Action = r.URL.Query().Get("a")
 
-	var err error
-
 	if page.Action == "edit" && r.FormValue("save") == "Save" {
 		page.NoteContents = []byte(r.FormValue("note"))
-		err = page.save()
-		if err != nil {
+
+		if err := page.save(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		http.Redirect(w, r, "/n/"+page.NoteBookName+"/"+page.NoteName, http.StatusFound)
 	}
 
 	if page.Action == "delete" && r.FormValue("delete") == "DELETE" {
-		err = page.delete()
-		if err != nil {
+		if err := page.delete(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -44,36 +42,31 @@ func NoteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if page.Notebooks == nil {
-		err = getNoteBooks(&page)
-		if err != nil {
+		if err := getNoteBooks(&page); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	err = getNotes(&page)
-	if err != nil {
+	if err := getNotes(&page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// create new note if it doesn't exist
 	if !contains(page.Notes, page.NoteName) {
-		err = page.createNote()
-		if err != nil {
+		if err := page.createNote(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	err = loadContent(&page)
-	if err != nil {
+	if err := loadContent(&page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = noteTmpl.ExecuteTemplate(w, "base", &page)
-	if err != nil {
+	if err := noteTmpl.ExecuteTemplate(w, "base", &page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
