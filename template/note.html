@@ -7,7 +7,7 @@
     <input type="submit" class="btn btn-danger" value="Cancel" name="cancel">
     <br>
     <br>
-    <textarea cols="100" rows="25" name="note" tabindex="1">{{printf "%s" .NoteContents}}</textarea>
+    <textarea cols="80" rows="25" name="note" id="textile">{{printf "%s" .NoteContents}}</textarea>
   {{else}}
     <br>
     <button class="btn btn-primary" onclick="window.location='{{ .NoteName }}?a=edit'">Edit</button>
@@ -21,9 +21,18 @@
 {{end}}
 
 {{define "js"}}
+  <link rel="stylesheet" type="text/css" href="/js/markitup/skins/simple/style.css" />
+  <link rel="stylesheet" type="text/css" href="/js/markitup/sets/textile/style.css" />
+
+  <script type="text/javascript" src="/js/markitup/jquery.markitup.js"></script>
+  <script type="text/javascript" src="/js/markitup/sets/textile/set.js"></script>
+
   <script src="/js/textile.js"></script>
+
   <script type="text/javascript">
     $( document ).ready(function() {
+      $('#textile').markItUp(myTextileSettings);
+
       $( "#rendered_note" ).html(textile({{printf "%s" .NoteContents}}));
     });
   </script>
