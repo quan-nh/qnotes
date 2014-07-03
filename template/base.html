@@ -6,7 +6,7 @@
       {{.Title}}
     </title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-    <link rel="icon" type="image/jpeg" href="static/magpie.jpg" />
+    <link rel="icon" type="image/jpeg" href="image/magpie.jpg" />
   </head>
   <body>
     <br>
@@ -39,7 +39,7 @@
 {{/* iterate though existing notebooks */}}
 {{range $notebook := .Notebooks}}
         <li {{if eq $.NoteBookName $notebook}}class="active"{{end}}>
-          <a href="/{{$notebook}}">
+          <a href="/n/{{$notebook}}">
             {{$notebook}}
           </a>
         </li>
@@ -83,7 +83,7 @@
 {{/* iterate through existing notes */}}
 {{range $note := .Notes}}
         <li {{if eq $.NoteName $note}}class="active"{{end}}>
-          <a href="/{{$.NoteBookName}}/{{$note}}">
+          <a href="/n/{{$.NoteBookName}}/{{$note}}">
             {{$note}}
           </a>
         </li>
@@ -105,13 +105,13 @@
         $(self).parents("li").first().addClass("hidden");
       };
       var new_notebook = function(self){
-        var name = '/'+$("#new_notebook_name").val();
+        var name = '/n/'+$("#new_notebook_name").val();
         $.post(name).done(function(){
           window.location = name;
         });
       };
       var new_note = function(self){
-        var name = '/{{.NoteBookName}}/' + $("#new_note_name").val();
+        var name = '/n/{{.NoteBookName}}/' + $("#new_note_name").val();
         $.post(name, data = {
            save: true
           ,note: ''
@@ -120,6 +120,7 @@
         });
       };
     </script>
+    {{template "js" .}}
   </body>
 </html>
 {{end}}

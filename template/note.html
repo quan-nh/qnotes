@@ -1,4 +1,5 @@
 {{define "content"}}
+
   {{if eq .Action "edit"}}
     <br>
     <form method="POST">
@@ -6,7 +7,7 @@
     <input type="submit" class="btn btn-danger" value="Cancel" name="cancel">
     <br>
     <br>
-    <textarea cols="80" rows="20" name="note" tabindex="1">{{printf "%s" .NoteContents}}</textarea>
+    <textarea cols="100" rows="25" name="note" tabindex="1">{{printf "%s" .NoteContents}}</textarea>
   {{else}}
     <br>
     <button class="btn btn-primary" onclick="window.location='{{ .NoteName }}?a=edit'">Edit</button>
@@ -14,42 +15,16 @@
     <br>
     <br>
     <div id="rendered_note">
-      <div id="savefail" class="alert alert-danger fade in hidden" data-dismiss="alert">
-        <span onclick="$(this).parent().addClass('hidden');">×</span>
-        There was a failure saving the change, please refresh and try again.
-      </div>
-      {{printf "%s" .NoteContents}}
     </div>
   {{end}}
 
-  <script type=text/javascript>
-    function checkbox_replace(el) {
-      var checkbox_regex = /\[([x| ])\](.*)<\/p>/g;
-      var replace_html   = "<label><input type=checkbox onchange=\"toggle(this)\" zindex=\"$$INDEX$$\"$$CHECKED$$>$$TEXT$$</label>";
-      var index          = 0;
-      $(el).html($(el).html().replace(checkbox_regex, function(a,b,c){
-        return replace_html.replace("$$INDEX$$", index++).replace("$$TEXT$$", c).replace("$$CHECKED$$", b == " " ? "" : " checked=\"true\"");
-      }));
-    }
-    function toggle(el) {
-      var sindex = $(el).attr("zindex");
-      var ostate = !$(el).is(":checked");
-      $.post(
-         "{{ .NoteName }}"
-        ,data={
-           note:   ''
-          ,toggle: sindex
-          ,save:   true
-        }
-      ).error(function(){
-        if(ostate){
-          $("input[zindex='" + sindex + "']").prop("checked", true);
-        }else{
-          $("input[zindex='" + sindex + "']").removeAttr("checked");
-        }
-        $("#savefail").removeClass("hidden");
-      });
-    }
-  </script>
+{{end}}
 
+{{define "js"}}
+  <script src="/js/textile.js"></script>
+  <script type="text/javascript">
+    $( document ).ready(function() {
+      $( "#rendered_note" ).html(textile({{printf "%s" .NoteContents}}));
+    });
+  </script>
 {{end}}
