@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type page struct {
+type Page struct {
 	Title        string
 	Notebooks    []string
 	NoteBookName string
@@ -14,18 +14,18 @@ type page struct {
 	NoteName     string
 	NoteContents []byte
 	Action       string
-	Conf         config
+	Conf         Config
 }
 
-var Page page
+var page Page
 var homeTmpl = template.Must(template.New("home").ParseFiles("template/base.html", "template/home.html"))
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	// set default value
-	Page.Title = "note/home"
-	Page.NoteBookName = ""
-	Page.Notes = nil
-	Page.NoteName = ""
+	page.Title = "note/home"
+	page.NoteBookName = ""
+	page.Notes = nil
+	page.NoteName = ""
 
 	// get notebooks
 	if err := getNoteBooks(); err != nil {
@@ -34,7 +34,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render template
-	if err := homeTmpl.ExecuteTemplate(w, "base", &Page); err != nil {
+	if err := homeTmpl.ExecuteTemplate(w, "base", &page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -43,16 +43,16 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 // get notebooks in repo.
 func getNoteBooks() error {
 
-	fileInfos, err := ioutil.ReadDir(Page.Conf.Repo)
+	fileInfos, err := ioutil.ReadDir(page.Conf.Repo)
 	if err != nil {
 		return err
 	}
 
-	Page.Notebooks = Page.Notebooks[:0]
+	page.Notebooks = page.Notebooks[:0]
 	for _, fileInfo := range fileInfos {
 
 		if fileInfo.IsDir() && fileInfo.Name() != ".git" {
-			Page.Notebooks = append(Page.Notebooks, fileInfo.Name())
+			page.Notebooks = append(page.Notebooks, fileInfo.Name())
 		}
 
 	}

@@ -15,10 +15,10 @@ func main() {
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public/")))
 	http.Handle("/", r)
 
-	err := handler.LoadConfig()
+	conf, err := handler.LoadConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	http.ListenAndServe(":"+handler.Page.Conf.Port, nil)
+	http.ListenAndServe(":"+conf.Port, nil)
 }

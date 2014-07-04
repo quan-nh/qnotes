@@ -17,8 +17,8 @@ var notebookTmpl = template.Must(template.New("notebook").ParseFiles("template/b
 
 func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 
-	Page.NoteBookName = mux.Vars(r)["notebook"]
-	Page.Title = "note/" + Page.NoteBookName
+	page.NoteBookName = mux.Vars(r)["notebook"]
+	page.Title = "note/" + page.NoteBookName
 
 	if err := getNoteBooks(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -26,8 +26,8 @@ func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create new notebook if it doesn't exist
-	if !contains(Page.Notebooks, Page.NoteBookName) {
-		if err := Page.createNotebook(); err != nil {
+	if !contains(page.Notebooks, page.NoteBookName) {
+		if err := page.createNotebook(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -38,7 +38,7 @@ func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := notebookTmpl.ExecuteTemplate(w, "base", &Page); err != nil {
+	if err := notebookTmpl.ExecuteTemplate(w, "base", &page); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -46,24 +46,24 @@ func NotebookHandler(w http.ResponseWriter, r *http.Request) {
 
 func getNotes() error {
 
-	fileInfos, err := ioutil.ReadDir(Page.Conf.Repo + "/" + Page.NoteBookName)
+	fileInfos, err := ioutil.ReadDir(page.Conf.Repo + "/" + page.NoteBookName)
 	if err != nil {
 		return err
 	}
 
-	Page.Notes = Page.Notes[:0]
+	page.Notes = page.Notes[:0]
 
 	for _, fileInfo := range fileInfos {
 		if !fileInfo.IsDir() {
-			Page.Notes = append(Page.Notes, strings.TrimSuffix(fileInfo.Name(), ext))
+			page.Notes = append(page.Notes, strings.TrimSuffix(fileInfo.Name(), ext))
 		}
 	}
 
 	return nil
 }
 
-func (p *page) createNotebook() error {
-	filename := Page.Conf.Repo + "/" + p.NoteBookName
+func (p *Page) createNotebook() error {
+	filename := page.Conf.Repo + "/" + p.NoteBookName
 	return os.Mkdir(filename, os.ModeDir)
 }
 
